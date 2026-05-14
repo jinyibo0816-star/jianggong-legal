@@ -8,7 +8,7 @@
     {
       "name": "jianggong-legal",
       "source": "./jianggong-legal",
-      "description": "中国建设工程施工合同纠纷办案 skill 集——案件立卷（matter-intake）、要素式起诉状起草（pleading-draft）、诉讼时效核查（statute-of-limitations）、建工时间线梳理（chronology）。基于本地 legal-kb MCP，所有案件资料落地到 data/cases/<slug>/。每一份产出都是律师审核前的草稿，不是法律意见。",
+      "description": "中国建设工程施工合同纠纷办案 skill 集——案件立卷（matter-intake）、要素式起诉状起草（pleading-draft）、诉讼时效核查（statute-of-limitations）、建工时间线梳理（chronology）。基于本地 legal-kb MCP。一案一项目：所有工作产出落在当前 Cowork 项目根目录（matter.md / chronology.md / 时效核查.md / output/*.docx），与客户原始资料并排存放。每一份产出都是律师审核前的草稿，不是法律意见。",
       "author": {
         "name": "靳艺博"
       }

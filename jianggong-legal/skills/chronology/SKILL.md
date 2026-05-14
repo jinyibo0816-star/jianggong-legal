@@ -1,7 +1,7 @@
 ---
 name: chronology
-description: 建工纠纷案件时间线梳理——按建工标准节点（招投标、合同签订、开工、签证变更、停窝工、竣工验收、结算、催告、起诉）系统化录入与分析，输出 data/cases/<slug>/chronology.md 并自动识别缺口与风险节点。当用户说"时间线"、"案件时间线"、"梳理时间线"、"做个时间表"、"建工时间线"、"chronology"、"timeline"时触发。
-argument-hint: "[案件 slug，可选]"
+description: 建工纠纷案件时间线梳理——按建工标准节点（招投标、合同签订、开工、签证变更、停窝工、竣工验收、结算、催告、起诉）系统化录入与分析，输出 ./chronology.md 与 ./chronology.yaml 到当前项目根目录，并自动识别缺口与风险节点。当用户说"时间线"、"案件时间线"、"梳理时间线"、"做个时间表"、"建工时间线"、"chronology"、"timeline"时触发。
+argument-hint: ""
 ---
 
 # /chronology — 建工案件时间线梳理
@@ -10,11 +10,13 @@ argument-hint: "[案件 slug，可选]"
 
 建工纠纷案件的事实判断高度依赖时间链。这个 skill 把零散的合同、签证、催告、停工通知等事件按时间排列，生成一份**带证据来源**的标准时间线，并自动识别风险节点（如停工无催告、变更无签证、超期未结算、临近时效届满等）。
 
-## 工作目录
+## 工作原则
 
-- 案件档案：`/Users/jinyibo/Documents/Claude/Projects/开发/data/cases/<slug>/`
-- 输出：`/Users/jinyibo/Documents/Claude/Projects/开发/data/cases/<slug>/chronology.md`
-- 结构化数据：同目录下 `chronology.yaml`（便于其他 skill 复用）
+**一案一项目**——当前 Cowork 项目根目录就是这个案件的工作目录。
+
+- 输入：读 `./matter.md`（提取已立卷时录入的粗节点）
+- 输出：写 `./chronology.md`（可读版）+ `./chronology.yaml`（结构化）
+- 操作日志追加到 `./_history.md`
 
 ## 建工标准节点清单（按时间顺序）
 
@@ -79,8 +81,9 @@ argument-hint: "[案件 slug，可选]"
 
 ### 第 1 步：定位案件 & 读取已有信息
 
-- 读 `data/cases/<slug>/matter.md`，提取已有时间节点（matter-intake 第 6 步录入的粗节点）
-- 若已有 `chronology.md`，进入"更新模式"——只补新节点，不重复问
+- `pwd` 确认当前在案件项目目录
+- 读 `./matter.md`（不存在则提示用户先跑 `/matter-intake`），提取已有时间节点（matter-intake 第 6 步录入的粗节点）
+- 若已有 `./chronology.md`，进入"更新模式"——只补新节点，不重复问
 
 ### 第 2 步：分阶段引导录入
 
@@ -114,13 +117,13 @@ argument-hint: "[案件 slug，可选]"
 | 催告证据形式弱       | 催告事件 evidence 字段中只有"口头"/"电话"               | ⚠️ 时效中断可能不成立                     |
 | 结算文件未签字       | 结算事件 detail 中未明确"双方签字"                      | ⚠️ 结算金额可能被对方推翻                 |
 
-### 第 4 步：生成两份输出
+### 第 4 步：生成两份输出（都在当前项目根目录）
 
-#### `chronology.yaml`（结构化）
+#### `./chronology.yaml`（结构化）
 
 按时间排序的完整事件 list（结构见第 2 步）。
 
-#### `chronology.md`（可读版）
+#### `./chronology.md`（可读版）
 
 ```markdown
 # <案件简称> 时间线
@@ -166,12 +169,14 @@ argument-hint: "[案件 slug，可选]"
 
 ### 第 5 步：交付
 
-- 告知用户两份文件路径
+- 告知用户两份文件路径（`./chronology.md` + `./chronology.yaml`）
 - 列出 🔴 紧急项数量与 ⚠️ 关注项数量
+- 在 `./_history.md` 追加一行：`- <YYYY-MM-DD HH:MM> 时间线梳理完成 → chronology.md / chronology.yaml`
 - 建议下一步：若有 🔴 紧急项 → 跑 `/statute-of-limitations` 详细核查；若准备起诉 → 跑 `/pleading-draft`
 
 ## 重要约束
 
+- **所有产出落在 `./`**（当前项目根），不要写到任何其他绝对路径。
 - **每个节点必须有证据来源**——`evidence` 字段不能为空字符串。若用户说"记得有但找不到证据"，记为 `evidence: 待补充原始证据`，并打 ⚠️ flag。
 - **金额单位统一"元"**，不要用"万"或"亿"混写。如用户说"1.2 亿"，转写为 `120000000`。
 - **日期不能模糊**——"大概 2023 年中"这种要追问用户回到原始证据中确认。如确实不可得，记为 `date: ~2023-06`（带 `~` 前缀表示估算），并打 ⚠️ flag。
