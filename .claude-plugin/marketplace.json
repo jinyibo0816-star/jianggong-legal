@@ -1,8 +1,7 @@
 {
   "name": "jianggong-legal",
   "owner": {
-    "name": "靳艺博",
-    "organization": "广东广信君达（东莞）律师事务所"
+    "name": "靳艺博"
   },
   "plugins": [
     {
